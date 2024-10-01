@@ -1,0 +1,9 @@
+I. Version 1
+    1.  Create structures: utils, store, services, screens, navigations, components folder and functional components
+    2.  Add necessary assets: images. 
+        Understand when use png and svg. 
+        Group related images
+    3.  Create GlobalStyles
+
+II. Version 2
+    . Sửa Consistency trong Drawer, Screen ra Screen, Nút ra nút
