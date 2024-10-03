@@ -1,0 +1,14 @@
+I. Version 1
+1. Should return map(object/dict), not string
+
+II. Version 2
+1. Optimize database:
+    + Delete redundant columns: Replace DesiredViewSubscribe, DesiredViewLike, DesiredViewComment,
+                                        ActualViewSubscribe, ActualViewLike, ActualViewComment
+                                with additionalActivity, desiredAdditionalActivity, actualAdditionalActivity
+    + Data should not be null, should be a value
+
+2. Optimize user input
+    + For String, not require but if null value, return error.
+                apply strip() and convert to lowercase supporting for compare and consistency with Database
+3. Change the value of any object, use the repository of that object to update.
