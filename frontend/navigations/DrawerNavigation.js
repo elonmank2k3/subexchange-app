@@ -1,16 +1,14 @@
-import { Pressable, StyleSheet } from 'react-native'
+import { Pressable, Alert } from 'react-native'
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import React, { useContext } from 'react'
-import UserProfileScreen from '../screens/main/UserProfileScreen';
+import React, { useContext, useEffect } from 'react'
 import EarnCoinScreen from '../screens/main/EarnCoinScreen';
 import ManageVideoScreen from '../screens/main/ManageVideoScreen';
-import BuyCoinScreen from '../screens/main/BuyCoinScreen';
 import FAQsScreen from '../screens/main/FAQsScreen';
 import EarningHistoryScreen from '../screens/main/EarningHistoryScreen';
 import InviteFriendScreen from '../screens/main/InviteFriendScreen';
 import { GlobalStyles } from '../constants/globalStyles';
-import { UserIcon, EarnIcon, BuyIcon, VideoIcon, CrownIcon, FaqIcon, ListIcon, AddFriendIcon } from '../components/SvgIcons';
-import UpdateVipScreen from '../screens/main/UpdateVIPScreen';
+import {  EarnIcon, VideoIcon, CrownIcon, FaqIcon, ListIcon, AddFriendIcon } from '../components/SvgIcons';
+import UpdatePremiumScreen from '../screens/main/UpdatePremiumScreen';
 import CustomDrawerContent from '../components/CustomDrawerContent';
 import Coin from '../components/Coin';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -18,6 +16,7 @@ import AddVideoScreen from '../screens/main/AddVideoScreen';
 import { Ionicons } from '@expo/vector-icons';
 import InvitationRecordScreen from '../screens/main/InvitationRecordScreen';
 import { UserContext } from '../store/user-context';
+import { fetchUserInfo } from '../utils/http';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -92,6 +91,34 @@ const InviteFriendScreenStack = ({ navigation }) => {
 const DrawerNavigation = () => {
     const userContext = useContext(UserContext)
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await fetchUserInfo(userContext.googleUserId);
+                if (data['status'] == 'fail') {
+                    Alert.alert("Fail", data['message'])
+                    return 
+                }
+                
+                userContext.setName(data["userInfo"]['name'])
+                userContext.setCode(data["userInfo"]['code'])
+                userContext.setEmail(data["userInfo"]['email'])
+                userContext.setPicture(data["userInfo"]['picture'])
+                userContext.setCoin(data["userInfo"]['coin'])
+                userContext.setPremiumTime(data["userInfo"]['premiumTime'])
+                userContext.setWatchToBonusCount(data["userActivity"]['watchToBonusCount'])
+                userContext.setDidRate(data["userActivity"]['didRate'])
+            } catch (error) {
+                Alert.alert("Error", error.message)            
+            }
+        };
+
+        if (userContext.googleUserId != null) {
+            fetchData();
+        }
+        console.log("googleUserId: " + userContext.googleUserId)
+     }, [userContext.googleUserId]);
+
     return (
         <Drawer.Navigator 
         initialRouteName="Earn Coin"
@@ -100,7 +127,6 @@ const DrawerNavigation = () => {
             headerStyle: { backgroundColor: GlobalStyles.primaryColor },
             headerTintColor: 'white',
             sceneContainerStyle: { backgroundColor: 'white' },
-            drawerContentStyle: { backgroundColor: GlobalStyles.secondaryColor },
             drawerInactiveTintColor: 'black',
             drawerActiveTintColor: GlobalStyles.primaryColor,
         }}
@@ -126,19 +152,11 @@ const DrawerNavigation = () => {
                 }}
             />
             <Drawer.Screen 
-                name="Update VIP" 
-                component={UpdateVipScreen} 
+                name="Update Premium" 
+                component={UpdatePremiumScreen} 
                 options={{
                     drawerIcon: ({ color, size }) => (
                         <CrownIcon color={color} width={size} height={size}/>)
-                }}
-            />
-            <Drawer.Screen 
-                name="Buy Coin" 
-                component={BuyCoinScreen} 
-                options={{
-                    drawerIcon: ({ color, size }) => (
-                        <BuyIcon color={color} width={size} height={size}/>)
                 }}
             />
             <Drawer.Screen 
@@ -166,25 +184,8 @@ const DrawerNavigation = () => {
                     headerShown: false
                 }}
             />
-            <Drawer.Screen
-                name="User Profile"
-                component={UserProfileScreen}
-                options={{
-                    drawerIcon: ({ color, size }) => (
-                        <UserIcon color={color} width={size} height={size}/>),
-                }}
-            />
         </Drawer.Navigator>
     )
 }
 
 export default DrawerNavigation
-
-const styles = StyleSheet.create({
-    drawerIcon: {
-        width: 50,
-        height: 50,
-        color: 'black'
-    }
-})
-

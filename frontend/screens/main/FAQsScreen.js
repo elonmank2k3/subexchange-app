@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet, FlatList, Pressable, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, FlatList } from 'react-native'
 import React from 'react'
 import { GlobalStyles } from '../../constants/globalStyles'
-import Coin from '../../components/Coin'
 
 const FAQsScreen = () => {
   const FAQs = [

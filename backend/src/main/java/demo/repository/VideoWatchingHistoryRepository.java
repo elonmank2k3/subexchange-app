@@ -1,4 +1,5 @@
 package demo.repository;
+import demo.model.Video;
 import demo.model.VideoWatchingHistory;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,4 +21,8 @@ public interface VideoWatchingHistoryRepository extends JpaRepository<VideoWatch
     @Query(value = "SELECT EXISTS (SELECT 1 FROM video_watching_history WHERE viewer_id = :viewer_id AND video_id = :video_id AND activity = :activity);", nativeQuery = true)
     int didUserInteractWithVideo(@Param("viewer_id") Long viewerId, @Param("video_id") Long videoId, @Param("activity") String activity);
 
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM video_watching_history WHERE video_id = :video_id", nativeQuery = true)
+    void deleteAllByVideo(@Param("video_id") Long videoId);
 }

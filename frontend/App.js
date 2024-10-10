@@ -1,17 +1,25 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View} from 'react-native';
-import DrawerNavigation from './navigations/DrawerNavigation';
+import { StyleSheet} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import UserContextProvider from './store/user-context';
+import DialogContextProvider from './store/dialog-context';
+import NotificationContextProvider from './store/notification-context';
+import MainNavigation from './navigations/MainNavigation';
+import React from 'react';
+// import 'expo-dev-client'
 
 export default function App() {
   return (
     <UserContextProvider>
-      <NavigationContainer>
-        <View style={[styles.container]}>
-          <DrawerNavigation />
-        </View>
-      </NavigationContainer>
+      <DialogContextProvider>
+        <NotificationContextProvider>
+          <NavigationContainer>
+            <SafeAreaView style={[styles.container]}>
+              <MainNavigation />
+            </SafeAreaView>
+          </NavigationContainer>
+        </NotificationContextProvider>
+      </DialogContextProvider>
     </UserContextProvider>
   );
 }
@@ -19,7 +27,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: '100%',
-    backgroundColor: '#fff',
+    flex: 1,
   },
 });

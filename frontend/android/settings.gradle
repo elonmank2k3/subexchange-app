@@ -44,7 +44,7 @@ if (getRNMinorVersion() >= 75) {
   }
 }
 
-rootProject.name = 'subexchange'
+rootProject.name = 'SubExchange'
 
 dependencyResolutionManagement {
   versionCatalogs {

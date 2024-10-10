@@ -1,14 +1,11 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react'
-import ViewScreen from './sub-screens/ViewScreen';
 import SubscribeScreen from './sub-screens/SubscribeScreen';
 import LikeScreen from './sub-screens/LikeScreen';
 import CommentScreen from './sub-screens/CommentScreen';
 import { ViewIcon, SubscribeIcon, LikeIcon, CommentIcon } from '../../components/SvgIcons';
 import { GlobalStyles } from '../../constants/globalStyles';
-import { UserContext } from '../../store/user-context'
-import { useContext, useEffect } from 'react';
-
+import WatchScreen from './sub-screens/WatchScreen';
 const BottomTabs = createBottomTabNavigator();
 
 const EarnCoinScreen = () => {
@@ -22,8 +19,8 @@ const EarnCoinScreen = () => {
       })}
     >
       <BottomTabs.Screen
-        name="View Screen"
-        component={ViewScreen}
+        name="Watch Screen"
+        component={WatchScreen}
         options={{
           tabBarLabel: 'Watch',
           tabBarIcon: ({ color, size }) => (

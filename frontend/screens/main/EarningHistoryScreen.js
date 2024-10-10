@@ -1,28 +1,34 @@
-import { View, Text, StyleSheet, FlatList, Pressable, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, FlatList, Alert } from 'react-native'
 import { GlobalStyles } from '../../constants/globalStyles'
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext, useCallback } from 'react'
 import Coin from '../../components/Coin'
 import { UserContext } from '../../store/user-context'
 import { capitalizeFirstLetter } from '../../utils/utilsFuncs'
 import { fetchEarningHistories } from "../../utils/http"
+import { useFocusEffect } from '@react-navigation/native'
 
 const EarningHistoryScreen = () => {
   const [earningHistories, setEarningHistories] = useState([])
   const userContext = useContext(UserContext);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchEarningHistories(userContext.googleUserId);
-        setEarningHistories(data['earningHistories'] || [])
-      } catch (error) {
-        console.error("Error fetching earning histories: ", error);
-      }
-    };
-  
-    fetchData();
-  }, [userContext.googleUserId]);
-  
+  useFocusEffect( // To trigger a function each time a user navigates to a new screen in React Navigation
+    useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const data = await fetchEarningHistories(userContext.googleUserId);
+          if (data['stats'] === 'fail') {
+            Alert.alert("Fail", data['message'])
+            return
+          }
+          setEarningHistories(data['earningHistories'] || [])
+        } catch (error) {
+          Alert.alert("Error", error.message)
+        }
+      };
+    
+      fetchData();
+    }, [userContext.googleUserId])
+  );
 
   return (
     <View style={styles.container}>
@@ -32,7 +38,7 @@ const EarningHistoryScreen = () => {
       {
         earningHistories.length == 0 ?
         <View style={{flex: 1, justifyContent: "center"}}>
-          <Text style={{fontSize: 17}}>No earning history</Text>
+          <Text style={{fontSize: 18}}>No earning history</Text>
         </View>:
         <FlatList 
           data={earningHistories}

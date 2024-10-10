@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, FlatList } from 'react-native'
+import { View, Text, StyleSheet, Image, FlatList, Alert } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import CoinIcon from "../../assets/coin.png"
 import FriendIcon from "../../assets/friend.png"
@@ -14,9 +14,13 @@ const InvitationRecordScreen = () => {
     const fetchData = async () => {
       try {
         const data = await fetchInvitationRecords(userContext.googleUserId);
+        if (data['stats'] === 'fail') {
+          Alert.alert("Fail", data['message'])
+          return
+        }
         setInvitees(data['invitationRecords'] || [])
       } catch (error) {
-        console.error("Error fetching earning histories: ", error);
+        Alert.alert("Error", error.message)
       }
     };
   
@@ -48,15 +52,15 @@ const InvitationRecordScreen = () => {
       {
         invitees.length == 0 ?
         <View style={{marginTop: GlobalStyles.sp, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Text>No friends. Invite to earn more</Text>
+          <Text style={{fontSize: 18}}>No friends. Invite to earn more</Text>
         </View>:
         <FlatList 
           data={invitees}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.item}>
-              <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>{item.email}</Text>            
-              <Text style={{color: 'white'}}>{String(item.created_at).replace("T", " ")}</Text>            
+              <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>{item.inviteeEmail}</Text>            
+              <Text style={{color: 'white'}}>{String(item.time).replace("T", " ")}</Text>            
             </View>
           )}
           style={{width: '100%'}}

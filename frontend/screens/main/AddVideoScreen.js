@@ -1,11 +1,12 @@
-import { View, Text, StyleSheet, Pressable, TextInput, Image, ScrollView, ActivityIndicator } from 'react-native'
+import { View, Text, StyleSheet, Pressable, TextInput, Image, ScrollView, ActivityIndicator, Alert } from 'react-native'
 import getVideoId from 'get-video-id';
 import React, { useContext, useEffect, useState } from 'react'
 import { GlobalStyles } from '../../constants/globalStyles'
 import { Picker } from '@react-native-picker/picker';
 import { uploadVideo } from '../../utils/http';
 import { UserContext } from '../../store/user-context';
-import Alert from '../../components/Alert';
+import { ADDITIONAL_ACTIVITY } from '../../constants/globalVariables';
+import { NotificationContext } from '../../store/notification-context';
 
 const AddVideoScreen = () => {
     const [ytVideoId, setYtVideoId] = useState("")
@@ -16,9 +17,8 @@ const AddVideoScreen = () => {
     const [expense, setExpense] = useState(0)
     const [isExpenseError, setIsExpenseError] = useState(false)
     const [isImageLoading, setIsImageLoading] = useState(true)
-    const [alertMessage, setAlertMessage] = useState("")
-    const [isAlertShown, setIsAlertShown] = useState(false)
     const userContext = useContext(UserContext)
+    const notificationContext = useContext(NotificationContext)
 
     function handleInputVideoLink(videoURL) {
         const { id } = getVideoId(videoURL)
@@ -54,7 +54,7 @@ const AddVideoScreen = () => {
         let calExpense = desiredView * timePerView + additionalActivityAmount * 60
         setExpense(calExpense)
 
-        if (calExpense > userContext.code)
+        if (calExpense > userContext.coin)
             setIsExpenseError(true)
         else
             setIsExpenseError(false)
@@ -63,29 +63,22 @@ const AddVideoScreen = () => {
     async function addVideo() {
         try {
             const data = await uploadVideo(userContext.googleUserId, ytVideoId, desiredView, additionalActivity, additionalActivityAmount, timePerView);
-            if (String(data['message']).includes("success")) {
-                setAlertMessage('Add video successfully')
-                setIsAlertShown(true)
-                setTimeout(() => setIsAlertShown(false), 3000)
+            if (data['status'] === "success") {
+                notificationContext.initialize('Add video successfully')
 
                 userContext.minusCoin(expense)
                 handleInputVideoLink("")
                 setDesiredView(10)
-                setAdditionalActivity("no option")
+                setAdditionalActivity(ADDITIONAL_ACTIVITY.NO_OPTION)
                 setAdditionalActivityAmount(0)
                 setTimePerView(60)
                 setExpense(0)
                 setIsImageLoading(true)
             } else {
-                setAlertMessage('Add video failed')
-                setIsAlertShown(true)
-                setTimeout(() => setIsAlertShown(false), 2000)
-
+                notificationContext.initialize('Add video failed')
             }
         } catch (error) {
-            setAlertMessage('Add video failed due to server error')
-            setIsAlertShown(true)
-            setTimeout(() => setIsAlertShown(false), 2000)
+            Alert.alert("Error", error.message)
         }
     }
 
@@ -95,7 +88,7 @@ const AddVideoScreen = () => {
                 <View style={styles.thumbnailWrapper}>
                     {isImageLoading && <ActivityIndicator style={styles.loader} size="large" color="white" />}
                     <Image 
-                        source={{uri: `https://i.ytimg.com/vi/${ytVideoId}/hq720.jpg`}} 
+                        source={{uri: `https://i.ytimg.com/vi/${ytVideoId}/0.jpg`}} 
                         style={{width: '100%', height: '100%'}} 
                         onLoad={() => setIsImageLoading(false)}
                     />
@@ -200,8 +193,8 @@ const AddVideoScreen = () => {
                 <View style={styles.buttonWrapper}>
                     <Pressable style={
                         [{width: '100%', backgroundColor: GlobalStyles.primaryColor, height: 50, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, borderRadius: 10},
-                        (isExpenseError || ytVideoId == "" || ytVideoId == undefined) && {backgroundColor: GlobalStyles.secondaryColor}]}
-                        disabled={isExpenseError || ytVideoId == "" || ytVideoId == undefined}
+                        (isExpenseError || ytVideoId == "" || ytVideoId == undefined || expense > userContext.coin) && {backgroundColor: GlobalStyles.secondaryColor}]}
+                        disabled={isExpenseError || ytVideoId == "" || ytVideoId == undefined || expense > userContext.coin}
                         onPress={addVideo}
                     >
                         <Text 
@@ -211,9 +204,6 @@ const AddVideoScreen = () => {
                     </Pressable>
                 </View>
             </ScrollView>
-            {   
-                isAlertShown && <Alert message={alertMessage}/>
-            }
         </>
         
     )

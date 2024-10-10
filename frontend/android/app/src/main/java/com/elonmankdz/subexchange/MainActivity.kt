@@ -1,4 +1,4 @@
-package com.elonmank2k3.subexchange
+package com.elonmankdz.subexchange
 
 import android.os.Build
 import android.os.Bundle

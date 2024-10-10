@@ -33,6 +33,15 @@ public class UserService {
     @Autowired
     InvitationRecordRepository invitationRecordRepository;
 
+    public Map<String, Object> getCurrentVersion(){
+        Map<String, Object> response = new HashMap<>();
+
+        Map<String, String> version = new HashMap<>();
+        version.put("currentVersion", "1.0");
+        response.put("status", "success");
+        response.put("versionInfo", version);
+        return response;
+    }
     public Map<String, Object> getInvitationRecords(String googleUserId) {
         Map<String, Object> response = new HashMap<>();
         User user = userRepository.findByGoogleUserId(googleUserId).orElseThrow(() -> new UserNotFoundException());
@@ -44,6 +53,7 @@ public class UserService {
         }
 
         response.put("message", "Get invitation records successfully");
+        response.put("status", "success");
         response.put("invitationRecords", dtos);
         return response;
     }
@@ -52,11 +62,12 @@ public class UserService {
         Map<String, Object> response = new HashMap<>();
 
         response.put("message", "Get user info successfully");
+        response.put("status", "success");
         response.put("userInfo", UserMapper.toDTO(user));
         response.put("userActivity", ActivityTrackingMapper.toDTO(user.getActivityTracking()));
         return response;
     }
-    public Map<String, Object> handleLogin(String authorization) {
+    public Map<String, Object> handleSignIn(String authorization) {
         User user = null;
 
         try{
@@ -64,6 +75,7 @@ public class UserService {
         } catch (AccessDeniedException e) {
             Map<String, Object> response = new HashMap<>();
             response.put("message", e.getMessage());
+            response.put("status", "fail");
             return response;
         }
 
@@ -75,6 +87,7 @@ public class UserService {
             } catch (AccessDeniedException e) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("message", e.getMessage());
+                response.put("status", "fail");
                 return response;
             }
             user.setGoogleUserId(String.valueOf(userInfo.get("sub")));
@@ -95,11 +108,13 @@ public class UserService {
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Sign up successfully");
+            response.put("status", "success");
             response.put("userInfo", UserMapper.toDTO(user));
             return response;
         } else {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Sign in successfully");
+            response.put("status", "success");
             response.put("userInfo", UserMapper.toDTO(user));
             return response;
         }
@@ -119,19 +134,16 @@ public class UserService {
 
         if (inviter == null) {
             response.put("message", "Incorrect referral code");
+            response.put("status", "fail");
+            return response;
         } else {
             User invitee = userRepository.findByGoogleUserId(googleUserId).orElseThrow(() -> new UserNotFoundException());
 
             // Check if user ever entered code
             boolean didEnterCode = invitee.getActivityTracking().isDidEnterReferralCode();
             if (didEnterCode) {
-                response.put("message", "User has already entered referral code");
-                return response;
-            }
-
-            // Check if user exists
-            if (invitee == null) {
-                response.put("message", "User not found");
+                response.put("message", "User have already entered referral code");
+                response.put("status", "fail");
                 return response;
             }
 
@@ -145,14 +157,14 @@ public class UserService {
             saveInvitationRecord(inviter, invitee.getEmail());
 
             response.put("message", "Enter referral code successfully");
+            response.put("status", "success");
+            return response;
         }
-        return response;
     }
 
     public User findUserByAuthorization(String authorization) throws AccessDeniedException {
         Map<String, Object> userInfo = getUserInfoByAuthorization(authorization);
-        User user = userRepository.findByGoogleUserId(String.valueOf(userInfo.get("sub"))).orElseThrow(
-                () -> new UserNotFoundException());
+        User user = userRepository.findByGoogleUserId(String.valueOf(userInfo.get("sub"))).orElse(null);
         return user;
     }
 

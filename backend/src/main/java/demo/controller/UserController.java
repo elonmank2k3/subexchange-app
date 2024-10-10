@@ -20,7 +20,7 @@ public class UserController {
     public ResponseEntity<Map> handleSignIn(
             @RequestParam String authorization
     ) {
-        return ResponseEntity.ok(userService.handleLogin(authorization));
+        return ResponseEntity.ok(userService.handleSignIn(authorization));
     }
 
     @PostMapping("/referral-code-input")
@@ -43,6 +43,11 @@ public class UserController {
             @RequestParam String googleUserId
     ) {
         return ResponseEntity.ok(userService.getInvitationRecords(googleUserId));
+    }
+
+    @GetMapping("/get-current-version")
+    public ResponseEntity<Map> getVersion() {
+        return ResponseEntity.ok(userService.getCurrentVersion());
     }
 }
 

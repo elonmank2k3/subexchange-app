@@ -1,31 +1,33 @@
-import { View, Text, StyleSheet, Pressable, Image, FlatList } from 'react-native'
-import React, { useContext, useEffect, useState, useCallback } from 'react'
+import { View, Text, StyleSheet, Pressable, Image, FlatList, Alert } from 'react-native'
+import React, { useContext, useState, useCallback } from 'react'
 import { GlobalStyles } from '../../constants/globalStyles'
 import { ViewIcon, SubscribeIcon, LikeIcon, CommentIcon, AddIcon } from "../../components/SvgIcons"
 import DeleteIcon from "../../assets/delete.png"
-import Modal from "../../components/Modal"
 import { UserContext } from '../../store/user-context'
 import { fetchUploadedVideos, deleteVideo } from '../../utils/http'
 import { useFocusEffect } from '@react-navigation/native';
-import Alert from '../../components/Alert'
+import { NotificationContext } from '../../store/notification-context'
+import { DialogContext } from '../../store/dialog-context'
 
 const ManageVideoScreen = ({ navigation }) => {
   const [videos, setVideos] = useState([])
-  const [isModalShown, setIsModalShown] = useState(false)
-  const [selectedId, setSelectedId] = useState(0)
   const [unusedCoin, setUnusedCoin] = useState(0)
-  const [alertMessage, setAlertMessage] = useState("")
-  const [isAlertShown, setIsAlertShown] = useState(false)
   const userContext = useContext(UserContext)
+  const notificationContext = useContext(NotificationContext)
+  const dialogContext = useContext(DialogContext)
 
   useFocusEffect( // To trigger a function each time a user navigates to a new screen in React Navigation
     useCallback(() => {
       const fetchData = async () => {
         try {
           const data = await fetchUploadedVideos(userContext.googleUserId);
+          if (data['stats'] === 'fail') {
+            Alert.alert("Fail", data['message'])
+            return
+          }
           setVideos(data['uploadedVideos'].reverse() || [])
         } catch (error) {
-          console.error("Error fetching earning histories: ", error);
+          Alert.alert("Error", error.message)
         }
       };
     
@@ -33,33 +35,52 @@ const ManageVideoScreen = ({ navigation }) => {
     }, [userContext.googleUserId])
   );
   
-  function handleClickDeleteButton(id) {
+  async function handleClickDeleteButton(id) {
     let unusedCoin = videos.find((video) => video.id == id).unusedCoin
     if (unusedCoin <= 0) {
-      setVideos(videos => videos.filter(video => video.id !== selectedId))
-      deleteVideo(userContext.googleUserId, selectedId)
-      setAlertMessage("Delete video successfully")
-      setIsAlertShown(true)
-      setTimeout(() => setIsAlertShown(false), 2000)
+      try {
+        const data = await deleteVideo(userContext.googleUserId, id)
+        if (data['status'] === "fail") {
+          Alert.alert("Fail", data['message'])
+          return
+        }
+       setVideos(videos => videos.filter(video => video.id !== id))
+      } catch (error) {
+        Alert.alert("Error", error.message)
+      }
+    
+      notificationContext.initialize("Delete video successfully")
     } else {
       setSelectedId(id)
       setUnusedCoin(videos.find((video) => video.id == id).unusedCoin)
-      toggleConfirmDeleteModal()
+
+      dialogContext.initialize(
+        "Delete video",
+        `Your video is not completed. ${"\n"} We return unused coin for you`,
+        unusedCoin,
+        "Cancel",
+        "Delete",
+        () => () => dialogContext.closeDialog(),
+        () => () => confirmDeleteVideo(id)
+      )
+      dialogContext.openDialog()
     }
   }
 
-  function toggleConfirmDeleteModal() {
-    setIsModalShown(prevValue => !prevValue)
-  }
-
-  function confirmDeleteVideo() {
-    setVideos(videos => videos.filter(video => video.id !== selectedId))
-    deleteVideo(userContext.googleUserId, selectedId)
-    setAlertMessage("Delete video successfully")
-    setIsAlertShown(true)
-    setTimeout(() => setIsAlertShown(false), 2000)
+  async function confirmDeleteVideo(id) {
+    dialogContext.closeDialog()
+    try {
+      const data = await deleteVideo(userContext.googleUserId, id)
+      if (data['status'] === "fail") {
+        Alert.alert("Fail", data['message'])
+        return
+      }
+      setVideos(videos => videos.filter(video => video.id !== id))
+    } catch (error) {
+      Alert.alert("Error", error.message)
+    }
+    notificationContext.initialize("Delete video successfully")
     userContext.addCoin(unusedCoin)
-    toggleConfirmDeleteModal()
   }
 
   function navigateAddVideoScreen() {
@@ -72,7 +93,7 @@ const ManageVideoScreen = ({ navigation }) => {
         {
           videos.length == 0 ?
           <View style={{flex: 1, justifyContent: "center"}}>
-            <Text style={{fontSize: 17}}>No earning history</Text>
+            <Text style={{fontSize: 18}}>No uploaded video</Text>
           </View>:
           <FlatList 
             data={videos}
@@ -80,7 +101,7 @@ const ManageVideoScreen = ({ navigation }) => {
             renderItem={({ item }) => (
               <View style={styles.item}>
                 <View style={styles.thumbnailWrapper}>
-                  <Image source={{uri: `https://i.ytimg.com/vi/${item.ytVideoId}/hq720.jpg`}} style={{width: 1040/12, height: 585/12}}/>
+                  <Image source={{uri: `https://i.ytimg.com/vi/${item.ytVideoId}/0.jpg`}} style={{width: "100%", height: '100%', resizeMode: 'contain'}}/>
                 </View>
                 <View style={[styles.statistic]}>
                   <View style={{flexDirection: 'row'}}>
@@ -121,25 +142,6 @@ const ManageVideoScreen = ({ navigation }) => {
           <AddIcon width={50} height={50} color={GlobalStyles.primaryColor}/>
         </Pressable>
       </View>
-      {
-        isModalShown &&
-        <Modal 
-          title={'Delete Video'} 
-          message={`Your video is not completed. ${"\n"} We return unused coin for you`}
-          rewardCoin={unusedCoin}
-          buttonTitle01={'Cancel'}
-          buttonTitle02={'Delete'}
-          onPress01={toggleConfirmDeleteModal}
-          onPress02={confirmDeleteVideo}
-          messageAlign={'center'}
-        />
-      }
-      {
-        isAlertShown &&
-        <Alert
-          message={alertMessage}
-        />
-      }
     </>
   )
 }
@@ -155,7 +157,9 @@ const styles = StyleSheet.create({
   },
   thumbnailWrapper: {
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    width: 480/6,
+    height: 360/6, 
   },
   item: {
     backgroundColor: GlobalStyles.secondaryColor,

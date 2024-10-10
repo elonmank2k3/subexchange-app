@@ -1,23 +1,25 @@
 import { View, Text, StyleSheet } from 'react-native'
-import React from 'react'
+import React, { useContext } from 'react'
+import { NotificationContext } from '../store/notification-context'
 
-const Alert = ({ message }) => {
-  return (
-    <View style={styles.container}>
-        <View style={styles.messageWrapper}>
-            <Text style={{fontWeight: 'bold'}}>{message}</Text>
+const Notification = () => {
+    const notificationContext = useContext(NotificationContext)
+    return (
+        <View style={styles.container}>
+            <View style={styles.messageWrapper}>
+                <Text style={{fontWeight: 'bold'}}>{notificationContext.message}</Text>
+            </View>
         </View>
-    </View>
-  )
+    )
 }
 
-export default Alert
+export default Notification
 
 const styles = StyleSheet.create({
     container: {
         position: "absolute",
         width: "100%",
-        top: 10,
+        top: 100,
         left: 0,
         justifyContent: 'center',
         alignItems: 'center',

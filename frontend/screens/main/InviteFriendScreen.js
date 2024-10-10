@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Pressable, Image, Share } from 'react-native'
 import * as Clipboard from 'expo-clipboard';
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { useState } from 'react'
 import { GlobalStyles } from '../../constants/globalStyles'
 import CopyIcon from '../../assets/copy.png'

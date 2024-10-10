@@ -52,10 +52,10 @@ public class VideoController {
     @PostMapping("/get-video-reward")
     public ResponseEntity<Map> getVideoReward(
             @RequestParam String googleUserId,
-            @RequestParam String activity,
+            @RequestParam String activityType,
             @RequestParam boolean didGetDoubleCoin
     ) {
-        return ResponseEntity.ok(videoService.getVideoReward(googleUserId, activity, didGetDoubleCoin));
+        return ResponseEntity.ok(videoService.getVideoReward(googleUserId, activityType, didGetDoubleCoin));
     }
 
     @PostMapping("/get-video-bonus")
@@ -102,5 +102,12 @@ public class VideoController {
             @RequestParam String googleUserId
     ) {
         return ResponseEntity.ok(videoService.getUploadVideos(googleUserId));
+    }
+
+    @PostMapping("/track-watched-video-statistic")
+    public ResponseEntity<Map> trackWatchedVideoStatistic(
+            @RequestParam String googleUserId
+    ) {
+        return ResponseEntity.ok(videoService.trackWatchedVideoStatistics(googleUserId));
     }
 }

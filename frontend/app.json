@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "subexchange",
+    "name": "SubExchange",
     "slug": "subexchange",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -14,11 +14,25 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.elonmank2k3.subexchange",
+      "package": "com.elonmankdz.subexchange",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4cc6e70a-9a96-4045-b27a-d1856c42e1e2"
+      }
+    },
+    "plugins": [
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-9182049451814966~5723008732",
+          "iosAppId": "ca-app-pub-9182049451814966~8926954242"
+        }
+      ]
+    ]
   }
 }

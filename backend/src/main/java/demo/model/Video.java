@@ -41,6 +41,4 @@ public class Video {
     User uploadedUser;
     @OneToMany(mappedBy = "video", cascade = CascadeType.ALL, orphanRemoval = true)
     List<VideoWatchingHistory> videoWatchingHistories;
-    @OneToOne
-    ActivityTracking activityTracking;
 }
