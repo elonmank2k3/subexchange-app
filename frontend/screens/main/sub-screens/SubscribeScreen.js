@@ -93,7 +93,7 @@ const SubscribeScreen = () => {
 
   return (
       <>
-        <View style={styles.container}>
+        <View className="h-full w-full items-center">
           <TemplateScreen activityType={ACTIVITY_TYPE.SUBSCRIBE}/>
         </View>
       </>
@@ -101,11 +101,3 @@ const SubscribeScreen = () => {
 }
 
 export default SubscribeScreen
-
-const styles = StyleSheet.create({
-  container: {
-      height: '100%',
-      width: '100%',
-      alignItems: 'center'
-  },
-})

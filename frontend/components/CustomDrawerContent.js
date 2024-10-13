@@ -5,13 +5,14 @@ import { GlobalStyles } from '../constants/globalStyles';
 import CoinIcon from '../assets/coin.png'; 
 import PremiumIcon from '../assets/premium.png'; 
 import { UserContext } from '../store/user-context';
-import { calculatePremiumTime } from '../utils/utilsFuncs';
 import Button from './Button';
-import tw from 'tailwind-react-native-classnames';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { START_STEP } from '../constants/globalVariables';
 
 const CustomDrawerContent = (props) => {
   const userContext = useContext(UserContext)
   const [hours, setHours] = useState(0)
+
 
   useEffect(() => {
     const premiumTime = new Date(userContext.premiumTime)
@@ -24,6 +25,11 @@ const CustomDrawerContent = (props) => {
       setHours(diffInHours.toFixed(0))
     }
   }, [userContext.premiumTime, userContext.googleUserId])
+
+  function handleLogout() {
+    AsyncStorage.removeItem("authorization")
+    props.setStartStep(START_STEP.AUTH)
+  }
 
   return (
     <DrawerContentScrollView {...props}>
@@ -55,8 +61,8 @@ const CustomDrawerContent = (props) => {
         </View>
       </View>
       <DrawerItemList {...props} />
-      <View style={[tw`justify-center items-center mt-10`]}>
-        <Button title={"Log out"}/>
+      <View className="justify-center items-center mt-10">
+        <Button title={"Log out"} onPress={handleLogout}/>
       </View>
     </DrawerContentScrollView>
   );

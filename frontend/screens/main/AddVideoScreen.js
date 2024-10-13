@@ -84,7 +84,7 @@ const AddVideoScreen = () => {
 
     return (
         <>
-            <ScrollView style={styles.container}>
+            <ScrollView className="w-full h-full">
                 <View style={styles.thumbnailWrapper}>
                     {isImageLoading && <ActivityIndicator style={styles.loader} size="large" color="white" />}
                     <Image 
@@ -93,7 +93,7 @@ const AddVideoScreen = () => {
                         onLoad={() => setIsImageLoading(false)}
                     />
                 </View>
-                <View style={styles.requiredSetting}>
+                <View className="requiredSetting items-center px-primary w-full mt-[10]">
                     <Text style={styles.title}>Required setting</Text>
                     <View style={styles.content}>
                         <TextInput 
@@ -139,7 +139,7 @@ const AddVideoScreen = () => {
                         </View>
                     </View>
                 </View>
-                <View style={styles.optionalSetting}>
+                <View className="optionalSetting items-center px-primary w-full mt-[20]">
                     <Text style={styles.title}>Optional setting</Text>
                     <View style={styles.content}>
                         <View style={[styles.option]}>
@@ -174,7 +174,7 @@ const AddVideoScreen = () => {
                 <View style={styles.horizontalBar}>
                     <View style={{width: '100%', backgroundColor: 'black', height: 2}}></View>
                 </View>
-                <View style={styles.calculationCoin}>
+                <View className="calculationCoin items-center px-primary w-full mt-primary">
                     <View style={styles.content}>
                         <View style={[styles.option]}>
                             <Text style={styles.label}>Your current coin</Text>
@@ -190,17 +190,14 @@ const AddVideoScreen = () => {
                         </View>
                     </View>
                 </View>
-                <View style={styles.buttonWrapper}>
-                    <Pressable style={
-                        [{width: '100%', backgroundColor: GlobalStyles.primaryColor, height: 50, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, borderRadius: 10},
-                        (isExpenseError || ytVideoId == "" || ytVideoId == undefined || expense > userContext.coin) && {backgroundColor: GlobalStyles.secondaryColor}]}
+                <View className="mt-[20] w-full justify-end items-center px-primary h-[50]">
+                    <Pressable  
+                        className="w-full bg-primary justify-center items-center px-primary"
+                        style={[{height: 50, borderRadius: 10}, (isExpenseError || ytVideoId == "" || ytVideoId ==  undefined || expense > userContext.coin) && {backgroundColor: GlobalStyles.secondaryColor}]}
                         disabled={isExpenseError || ytVideoId == "" || ytVideoId == undefined || expense > userContext.coin}
                         onPress={addVideo}
                     >
-                        <Text 
-                            style={[{color: 'white', fontSize: 20, fontWeight: 'bold'}]}>
-                                Add video
-                        </Text>
+                        <Text className="font-bold text-lg text-white">Add video</Text>
                     </Pressable>
                 </View>
             </ScrollView>
@@ -212,10 +209,6 @@ const AddVideoScreen = () => {
 export default AddVideoScreen
 
 const styles = StyleSheet.create({
-    container: {
-        width: '100%',
-        height: '100%',
-    },
     thumbnailWrapper: {
         width: '100%',
         height: 250,
@@ -224,24 +217,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         position: 'relative',
         padding: 5,
-    },
-    requiredSetting: {
-        alignItems: 'center',
-        paddingHorizontal: GlobalStyles.spacing,
-        width: '100%',
-        marginTop: 10,
-    },
-    optionalSetting: {
-        alignItems: 'center',
-        paddingHorizontal: GlobalStyles.spacing,
-        width: '100%',
-        marginTop: 20,
-    },
-    calculationCoin: {
-        alignItems: 'center',
-        paddingHorizontal: GlobalStyles.spacing,
-        width: '100%',
-        marginTop: GlobalStyles.spacing
     },
     videoInput: {
         width: '100%',
@@ -289,12 +264,6 @@ const styles = StyleSheet.create({
         width: '100%',
         marginTop: GlobalStyles.spacing + 10,
         paddingHorizontal: GlobalStyles.spacing
-    },
-    buttonWrapper: {
-        marginTop: 20,
-        width: '100%', height: 50, 
-        justifyContent: 'flex-end', 'alignItems': 'center', 
-        paddingHorizontal: 10,
     },
     loader: {
         position: 'absolute',

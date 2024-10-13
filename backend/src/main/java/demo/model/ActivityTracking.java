@@ -25,7 +25,7 @@ public class ActivityTracking {
     private String activityType;
     @Column(columnDefinition = "INT")
     private Integer initialAmount;
-    @Column(columnDefinition = "INT DEFAULT 3", name = "watch_to_bonus_count", insertable = false)
+    @Column(columnDefinition = "INT DEFAULT 0", name = "watch_to_bonus_count", insertable = false)
     private Integer watchToBonusCount;
     @Column(columnDefinition = "BOOLEAN DEFAULT 0", insertable = false)
     private boolean didRate;

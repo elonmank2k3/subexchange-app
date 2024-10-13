@@ -6,10 +6,9 @@ import { GlobalStyles } from '../../constants/globalStyles'
 import { START_STEP } from '../../constants/globalVariables'
 import { handleSignIn } from '../../utils/http'
 import { UserContext } from '../../store/user-context'
-import {
-    GoogleSignin,
-  } from '@react-native-google-signin/google-signin';
-    
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
   GoogleSignin.configure({
     webClientId: '949745649970-mkfqmsnafmakofqvs3ruqrilb3b2hgno.apps.googleusercontent.com',
     scopes: [],
@@ -18,12 +17,36 @@ import {
 const AuthScreen = ({ setStartStep }) => {
     const userContext = useContext(UserContext)
     
-    const signIn = async () => {
+    const clickSignIn = async () => {
+      try {
+        await GoogleSignin.hasPlayServices();
+        const { data } = await GoogleSignin.signIn();
+        const authorization = data['idToken']
         try {
-          await GoogleSignin.hasPlayServices();
-          const { data } = await GoogleSignin.signIn();
-          const authorization = data['idToken']
-          try {
+          const data = await handleSignIn(authorization)
+          if (data['status'] === 'fail') {
+            Alert.alert("Error", data['message'])
+          }
+          if (data['message'] === "Sign in successfully") {
+            setStartStep(START_STEP.DASHBOARD)
+            userContext.setGoogleUserId(data['userInfo']['googleUserId'])
+          } else {
+            setStartStep(START_STEP.INPUT_CODE)
+            userContext.setGoogleUserId(data['userInfo']['googleUserId'])
+          }
+          AsyncStorage.setItem("authorization", authorization)
+        } catch (error){
+          Alert.alert("Error", error.message);
+        }
+      } catch (error) {
+      }
+    };
+
+    useEffect(() => {
+      const checkToken = async () => {
+        try {
+          var authorization = await AsyncStorage.getItem('authorization');
+          if (authorization) {
             const data = await handleSignIn(authorization)
             if (data['status'] === 'fail') {
               Alert.alert("Error", data['message'])
@@ -31,22 +54,20 @@ const AuthScreen = ({ setStartStep }) => {
             if (data['message'] === "Sign in successfully") {
               setStartStep(START_STEP.DASHBOARD)
               userContext.setGoogleUserId(data['userInfo']['googleUserId'])
-            } else {
-              setStartStep(START_STEP.INPUT_CODE)
-              userContext.setGoogleUserId(data['userInfo']['googleUserId'])
             }
-          } catch (error){
-            Alert.alert("Error", error.message);
-          }
+          } 
         } catch (error) {
-          Alert.alert("Fail", error.message)
+          Alert.alert("Error", error.message)
         }
-    };
-
+      };
+  
+      checkToken();
+    }, []);
+    
     return (
         <View style={styles.container}>
             <View style={styles.containerTop}>
-                <Image source={Logo} style={{width: 100, height: 100, marginTop: 100}}/>
+                <Image source={Logo} style={{width: 100, height: 100, marginTop: 100, borderRadius: 10}}/>
                 <Text style={styles.logoName}>SubExchange</Text>
                 <View style={styles.textGroup}>
                     <Text>Free to promote your channel</Text>
@@ -55,7 +76,7 @@ const AuthScreen = ({ setStartStep }) => {
                 </View>
             </View>
             <View style={styles.containerBottom}>
-                <Pressable style={styles.button} onPress={signIn}>
+                <Pressable style={styles.button} onPress={clickSignIn}>
                     <Image source={GoogleLogo} style={{width: 50, height: 50, borderRadius: 10}}/>
                     <Text style={styles.buttonTitle}>Sign In With Google</Text>
                 </Pressable>

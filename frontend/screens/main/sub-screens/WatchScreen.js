@@ -1,9 +1,8 @@
-import { View, StyleSheet, Alert } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
+import { View, StyleSheet } from 'react-native'
+import React, { useContext, useState } from 'react'
 import TemplateScreen from './TemplateScreen'
 import { UserContext } from '../../../store/user-context'
-import { skipVideo, loadVideo, getVideoReward, interactVideo } from '../../../utils/http'
-import { ACTIVITY_STATUS, ADDITIONAL_ACTIVITY, ACTIVITY_TYPE } from '../../../constants/globalVariables'
+import { ACTIVITY_TYPE } from '../../../constants/globalVariables'
 import { DialogContext } from '../../../store/dialog-context'
 
 const WatchScreen = () => {

@@ -8,7 +8,7 @@ const Button = ({ title, titleColor="white", onPress, buttonColor=GlobalStyles.p
         style={[styles.container, {backgroundColor: buttonColor, paddingHorizontal: paddingHorizontal, paddingVertical: paddingVertical}]}
         onPress={onPress}    
     >
-        <Text style={[GlobalStyles.titleStyle, {textAlign: "center", color: titleColor}]}>{title}</Text>
+        <Text style={{textAlign: "center", color: titleColor, fontWeight: "bold", fontSize: 20,}}>{title}</Text>
     </Pressable>
     )
 }

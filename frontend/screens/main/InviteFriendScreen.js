@@ -23,8 +23,7 @@ const InviteFriendScreen = ({ navigation }) => {
   const onShare = () => {
     Share.share({
       title: 'SubExchange',
-      message: '',
-      url: 'https://play.google.com/store/apps/details?id=com.sub.exchange'
+      message: `SubExchange - Promote your channel by exchanging view, subscribe, like and comment with other real people. \n JOIN HERE https://play.google.com/store/apps/details?id=com.sub.exchange \n Remember to enter my referral code ${userContext.code} to get free 300 coins`,
     })
   }
 
@@ -33,12 +32,12 @@ const InviteFriendScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <View className="h-full items-center px-primary">
       <View style={styles.subContainer}>
         <Image source={ReferralNetworkImage} style={{width: 3693/25, height: 3024/25}}/>
       </View>
       <View style={styles.subContainer}>
-       <Text style={{textAlign: 'justify', fontSize: 18}}>When your friend enters your referral code, both you and your friend will receive 300 coins and 1 day VIP account for trial.
+       <Text style={{textAlign: 'justify', fontSize: 18}}>When your friend enters your referral code, your friend get 300 coins and you get 1200 coins.
        </Text>
       </View>
       <View style={[styles.subContainer]}>
@@ -79,11 +78,6 @@ const InviteFriendScreen = ({ navigation }) => {
 export default InviteFriendScreen
 
 const styles = StyleSheet.create({
-  container: {
-    height: '100%',
-    alignItems: 'center',
-    paddingHorizontal: GlobalStyles.spacing
-  },
   subContainer: {
     marginTop: 30,
     width: '100%',

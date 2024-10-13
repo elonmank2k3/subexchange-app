@@ -366,8 +366,6 @@ public class VideoService {
         Map<String, Integer> curStatistic = getVideoStatistics(targetVideo.getYtVideoId());
         int amountBefore = activityTracking.getInitialAmount();
         int amountAfter = curStatistic.get(activityType);
-        System.out.println("amountBefore: " + amountBefore);
-        System.out.println("amountAfter: " + amountAfter);
         if (!(amountAfter > amountBefore || amountBefore == 0)) {
             response.put("message", "You don't " + activityType + " video, do it again or skip video");
             response.put("status", "fail");
@@ -583,7 +581,6 @@ public class VideoService {
                 content = content.substring(likeIndex);
                 int subIndex = content.indexOf("người đăng ký");
                 data = content.substring(subIndex - 10, subIndex);
-                System.out.println(data);
                 temp = "";
                 int subscribe = 0;
                 if (!(data.contains("nghìn") || data.contains("triệu") || data.contains("N") ||
@@ -599,14 +596,13 @@ public class VideoService {
                 statistics.put("subscribe", subscribe);
                 statistics.put("comment", 0);
             } else {
-                System.out.println("Request fail, Response code: " + responseCode);
                 statistics.put("like", 0);
                 statistics.put("subscribe", 0);
                 statistics.put("comment", 0);
             }
         } catch (Exception e) {
             System.out.println(e);
-            System.out.println("Error request");
+            System.out.println("Error request get video info");
             System.out.println("ytVideoId:" + ytVideoId);
             statistics.put("like", 0);
             statistics.put("subscribe", 0);

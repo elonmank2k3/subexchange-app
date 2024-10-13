@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "518880554746",
+    "project_id": "subexchange-2f05d",
+    "storage_bucket": "subexchange-2f05d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:518880554746:android:cfe301646d4edb5689a343",
+        "android_client_info": {
+          "package_name": "com.elonmankdz.subexchange"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNbbeIMNvwOwb5o8pyj7NVTJRHbiiYuCc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

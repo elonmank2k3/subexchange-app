@@ -11,7 +11,7 @@ const Dialog = () => {
     return (
         <View style={styles.container}>
             <View style = {[styles.content]}>
-                <Text style={GlobalStyles.titleStyle}>{dialogContext.title}</Text>
+                <Text style={{fontWeight: "bold", fontSize: 20}}>{dialogContext.title}</Text>
                 <Text style={[styles.message, {textAlign: dialogContext.messageAlign}]}>{dialogContext.message}</Text>
                 {dialogContext.rewardCoin != 0 && <View style={{marginTop: 15}}></View>}
                 {dialogContext.rewardCoin != 0 && <Coin amount={dialogContext.rewardCoin}/>}
@@ -47,7 +47,6 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
         alignItems: "center",
         paddingHorizontal: GlobalStyles.spacing,
-        // height: 'auto', 
     },
     message: {
         marginTop: 10,
@@ -56,8 +55,8 @@ const styles = StyleSheet.create({
     },
     buttonGroup: {
         width: '100%',
-        flexDirection: 'row', // Arrange buttons in a row
-        justifyContent: 'space-around', // Space buttons evenly
+        flexDirection: 'row',
+        justifyContent: 'space-around',
         alignItems: 'center'
     }
 })

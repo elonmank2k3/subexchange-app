@@ -1,11 +1,11 @@
-const baseURL = "http://192.168.11.103:8080/api"
+import { BACKEND_URL } from "@env"
+// const BACKEND_URL = "https://subexchange.site:443/api"
 
 export async function fetchEarningHistories(googleUserId) {
     const data = new FormData();
     data.append("googleUserId", googleUserId);
-  
     try {
-      var response = await fetch(baseURL + "/get-earning-histories", {
+      var response = await fetch(BACKEND_URL + "/get-earning-histories", {
         method: "POST",
         body: data
       });
@@ -21,7 +21,7 @@ export async function fetchUserInfo(googleUserId) {
     data.append("googleUserId", googleUserId);
   
     try {
-      var response = await fetch(baseURL + "/get-user-info", {
+      var response = await fetch(BACKEND_URL + "/get-user-info", {
         method: "POST",
         body: data,
       });
@@ -38,7 +38,7 @@ export async function fetchUploadedVideos(googleUserId) {
     data.append("googleUserId", googleUserId);
   
     try {
-      var response = await fetch(baseURL + "/get-uploaded-videos", {
+      var response = await fetch(BACKEND_URL + "/get-uploaded-videos", {
         method: "POST",
         body: data
       });
@@ -55,7 +55,7 @@ export async function fetchInvitationRecords(googleUserId) {
     data.append("googleUserId", googleUserId);
   
     try {
-      var response = await fetch(baseURL + "/get-invitation-records", {
+      var response = await fetch(BACKEND_URL + "/get-invitation-records", {
         method: "POST",
         body: data
       });
@@ -72,7 +72,7 @@ export async function deleteVideo(googleUserId, videoId, ) {
     data.append("videoId", videoId)
 
     try {
-      var response = await fetch(baseURL + "/delete-video", {
+      var response = await fetch(BACKEND_URL + "/delete-video", {
         method: "POST",
         body: data
       });
@@ -93,7 +93,7 @@ export async function uploadVideo(googleUserId, ytVideoId, desiredView, addition
     data.append("timePerView", timePerView)
 
     try {
-      var response = await fetch(baseURL + "/upload-video", {
+      var response = await fetch(BACKEND_URL + "/upload-video", {
         method: "POST",
         body: data
       });
@@ -111,7 +111,7 @@ export async function skipVideo(googleUserId, videoId, activityType) {
   data.append("activityType", activityType)
 
   try {
-    var response = await fetch(baseURL + "/skip-video", {
+    var response = await fetch(BACKEND_URL + "/skip-video", {
       method: "POST",
       body: data
     });
@@ -128,7 +128,7 @@ export async function loadVideo(googleUserId, additionalActivity) {
   data.append("additionalActivity", additionalActivity)
 
   try {
-    var response = await fetch(baseURL + "/get-video", {
+    var response = await fetch(BACKEND_URL + "/get-video", {
       method: "POST",
       body: data
     });
@@ -146,7 +146,7 @@ export async function getVideoReward(googleUserId, activityType, didGetDoubleCoi
   data.append("didGetDoubleCoin", didGetDoubleCoin)
 
   try {
-    var response = await fetch(baseURL + "/get-video-reward", {
+    var response = await fetch(BACKEND_URL + "/get-video-reward", {
       method: "POST",
       body: data
     });
@@ -164,7 +164,7 @@ export async function interactVideo(googleUserId, videoId, activityType) {
   data.append("activityType", activityType)
 
   try {
-    var response = await fetch(baseURL + "/interact-video", {
+    var response = await fetch(BACKEND_URL + "/interact-video", {
       method: "POST",
       body: data
     });
@@ -181,7 +181,7 @@ export async function getVideoBonus(googleUserId, didGetDoubleCoin) {
   data.append("didGetDoubleCoin", didGetDoubleCoin)
 
   try {
-    var response = await fetch(baseURL + "/get-video-bonus", {
+    var response = await fetch(BACKEND_URL + "/get-video-bonus", {
       method: "POST",
       body: data
     });
@@ -197,7 +197,7 @@ export async function handleSignIn(authorization) {
   data.append("authorization", authorization);
 
   try {
-    var response = await fetch(baseURL + "/sign-in", {
+    var response = await fetch(BACKEND_URL + "/sign-in", {
       method: "POST",
       body: data
     });
@@ -210,8 +210,9 @@ export async function handleSignIn(authorization) {
 
 export async function getCurrentVersion() {
   try {
-    var response = await fetch(baseURL + "/get-current-version");
-  } catch {
+    var response = await fetch(BACKEND_URL + "/get-current-version");
+  } catch(error) {
+    // console.error(error)
     throw new Error("Network problem, check your network connection or contact us for problem. Email: subexchange@gmail.com")
   }
 
@@ -224,7 +225,7 @@ export async function inputReferralCode(googleUserId, referralCode) {
   data.append("referralCode", referralCode);
 
   try {
-    var response = await fetch(baseURL + "/referral-code-input", {
+    var response = await fetch(BACKEND_URL + "/referral-code-input", {
       method: "POST",
       body: data
     });
@@ -240,7 +241,7 @@ export async function trackWatchedVideoStatistic(googleUserId) {
   data.append("googleUserId", googleUserId);
 
   try {
-    var response = await fetch(baseURL + "/track-watched-video-statistic", {
+    var response = await fetch(BACKEND_URL + "/track-watched-video-statistic", {
       method: "POST",
       body: data
     });
@@ -256,7 +257,7 @@ export async function checkVideoCompletion(googleUserId) {
   data.append("googleUserId", googleUserId);
 
   try {
-    var response = await fetch(baseURL + "/check-video-complete", {
+    var response = await fetch(BACKEND_URL + "/check-video-complete", {
       method: "POST",
       body: data
     });

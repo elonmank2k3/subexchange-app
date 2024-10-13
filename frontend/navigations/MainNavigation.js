@@ -6,7 +6,6 @@ import { UserContext } from '../store/user-context';
 import { checkVideoCompletion, getCurrentVersion } from '../utils/http';
 import { ACTIVITY_STATUS } from '../constants/globalVariables';
 import AuthScreen from "../screens/start/AuthScreen";
-import IntroScreen from "../screens/start/IntroScreen";
 import CodeInputScreen from "../screens/start/CodeInputScreen";
 import { START_STEP } from '../constants/globalVariables';
 import LogoShownScreen from '../screens/start/LogoShownScreen';
@@ -31,13 +30,14 @@ const MainNavigation = () => {
     async function fetchData() {
       try {
         const data = await getCurrentVersion()
+        console.log(data)
         if (data['versionInfo']['currentVersion'] !== "1.0") {
           setIsVersionMatched(false)
           Alert.alert(
             "Failed", 
             "You are using the old version. Update new version for new features",
             [
-              { text: "Update", onPress: () => Linking.openURL("https://play.google.com/store/apps/details?id=com.buee.mutupipe&hl=en") }
+              { text: "Update", onPress: () => Linking.openURL("https://play.google.com/store/apps/details?id=com.elonmankdz.subexchange") }
             ]
             )
         }
@@ -59,9 +59,7 @@ const MainNavigation = () => {
         <AuthScreen setStartStep={setStartStep}/>:
         startStep === START_STEP.INPUT_CODE ?
         <CodeInputScreen setStartStep={setStartStep}/> :
-        // startStep === START_STEP.WATCH_INTRO ?
-        // <IntroScreen /> :
-        <DrawerNavigation />
+        <DrawerNavigation setStartStep={setStartStep}/>
       }
       {
         userContext.activityTracking['activityStatus'] === ACTIVITY_STATUS.IN_PROGRESS &&

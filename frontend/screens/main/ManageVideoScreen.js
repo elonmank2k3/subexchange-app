@@ -51,7 +51,6 @@ const ManageVideoScreen = ({ navigation }) => {
     
       notificationContext.initialize("Delete video successfully")
     } else {
-      setSelectedId(id)
       setUnusedCoin(videos.find((video) => video.id == id).unusedCoin)
 
       dialogContext.initialize(

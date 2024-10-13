@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, FlatList, Alert } from 'react-native'
+import { View, Text, FlatList, Alert } from 'react-native'
 import { GlobalStyles } from '../../constants/globalStyles'
-import React, { useEffect, useState, useContext, useCallback } from 'react'
+import React, { useState, useContext, useCallback } from 'react'
 import Coin from '../../components/Coin'
 import { UserContext } from '../../store/user-context'
 import { capitalizeFirstLetter } from '../../utils/utilsFuncs'
@@ -31,7 +31,7 @@ const EarningHistoryScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View className="w-full px-primary items-center flex-1">
       <View style={{marginTop: GlobalStyles.spacing}}>
         <Text style={{fontSize: 20, fontWeight: 'bold'}}>List 20 latest earning histories</Text>
       </View>
@@ -42,12 +42,13 @@ const EarningHistoryScreen = () => {
         </View>:
         <FlatList 
           data={earningHistories}
+          showsVerticalScrollIndicator={false}
           keyExtractor={item => item.id.toString()}  
           renderItem={({ item }) => (
-            <View style={[styles.item]}>
+            <View className="flex-row justify-between bg-primary w-full py-primary mt-[10] rounded-lg px-primary flex-wrap">
               <View>
-                <Text style={styles.activity}>{capitalizeFirstLetter(item.activity)}</Text>
-                <Text style={styles.time}>{item.time.replace("T", " ")}</Text>
+                <Text style={{fontSize: 20}} className="font-bold text-white">{capitalizeFirstLetter(item.activity)}</Text>
+                <Text className="text-white">{item.time.replace("T", " ")}</Text>
               </View>
               <Coin amount={item.rewardCoin} size={25}/>
             </View>
@@ -59,32 +60,3 @@ const EarningHistoryScreen = () => {
 }
 
 export default EarningHistoryScreen
-
-const styles = StyleSheet.create({
-  container: {
-      width: '100%',
-      paddingHorizontal: GlobalStyles.spacing,
-      alignItems: 'center',
-      flex: 1
-  },
-  item: {
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    backgroundColor: GlobalStyles.primaryColor, 
-    width: '100%', 
-    paddingVertical: 15, 
-    marginTop: 20,
-    borderRadius: 10, 
-    paddingHorizontal: GlobalStyles.spacing,
-    flexWrap: 'wrap'
-  },
-  activity: {
-    fontSize: 18, 
-    fontWeight: 'bold',
-    color: 'white'
-  },
-  time: {
-    color: "white"
-  }
-})

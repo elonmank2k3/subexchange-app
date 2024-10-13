@@ -30,21 +30,19 @@ const CodeInputScreen = ({ setStartStep }) => {
         <View style={styles.container}>
             <View style={styles.containerTop}>
                 <View style={styles.logoWrapper}>
-                    <Image source={Logo} style={{width: 100, height: 100}}/>
+                    <Image source={Logo} style={{width: 100, height: 100, borderRadius: 10}}/>
                     <Text style={styles.logoName}>SubExchange</Text>
                 </View>
                 <View style={[styles.promptWrapper]}>
                     <Text style={styles.prompt}>
                         Enter your friends referral code to get free {'\n'}
                         <Text style={{fontWeight: 'bold'}}>300 coins </Text> 
-                        and
-                        <Text style={{fontWeight: 'bold'}}> 1 day Premium Account</Text>
                     </Text>
                 </View>
             </View>
             <View style={styles.containerBottom}>
                 <TextInput 
-                    style={[styles.input, GlobalStyles.titleStyle]}
+                    style={[styles.input, {fontWeight: "bold", fontSize: 20}]}
                     placeholder='Enter referral code'
                     cursorColor={"transparent"}
                     value={inputCode}

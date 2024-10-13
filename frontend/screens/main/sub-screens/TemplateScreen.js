@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, Image, Pressable, Alert, ActivityIndicator, Switch } from 'react-native'
 import React, { useState, useContext, useEffect } from 'react'
-import { GlobalStyles } from '../../../constants/globalStyles'
 import CoinIcon from "../../../assets/coin.png"
 import { TimeIcon } from '../../../components/SvgIcons'
 import Button from '../../../components/Button'
@@ -13,24 +12,24 @@ import { skipVideo, loadVideo, getVideoReward, interactVideo, getVideoBonus } fr
 import { DialogContext } from '../../../store/dialog-context'
 import { ACTIVITY_STATUS, ACTIVITY_TYPE, ADDITIONAL_ACTIVITY, ALIGNMENT } from '../../../constants/globalVariables'
 import { NotificationContext } from '../../../store/notification-context'
-import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
+import { RewardedAd, RewardedAdEventType } from 'react-native-google-mobile-ads';
+import { REWARD_UNIT_ID } from "@env"
 
-const adUnitId = "ca-app-pub-3940256099942544/5224354917";
+const rewarded = RewardedAd.createForAdRequest(REWARD_UNIT_ID, {
+    keywords: ['fashion', 'clothing'],
+  });
 
-const rewarded = RewardedAd.createForAdRequest(adUnitId);
-
-const TemplateScreen = ({ activityType=ACTIVITY_TYPE.WATCH }) => {
+const TemplateScreen = ({ activityType }) => {
     const userContext = useContext(UserContext)
     const dialogContext = useContext(DialogContext)
     const [isVideoLoading, setIsVideoLoading] = useState(true)
     const notificationContext = useContext(NotificationContext)
-    const [isAdsLoaded, setIsAdsLoaded] = useState(false);
     const [additionalActivity, setAdditionalActivity] = useState()
     const [video, setVideo] = useState({id: 0, coinPerView: 0, timePerView: 0})
 
-    async function fetchVideo(googleUserId, additionalActivity) {
+    async function fetchVideo(additionalActivity) {
         try {
-          const data = await loadVideo(googleUserId, additionalActivity);
+          const data = await loadVideo(userContext.googleUserId, additionalActivity);
           if (data['status'] == 'fail') {
             Alert.alert('Fail', data['message'])
             return
@@ -84,9 +83,21 @@ const TemplateScreen = ({ activityType=ACTIVITY_TYPE.WATCH }) => {
     )
     }
 
+    function showRewardedAd() {
+        if (rewarded.loaded) {
+            rewarded.show()
+            setTimeout(() => {
+                rewarded.load()
+            }, 15000)
+        } else {
+            notificationContext.initialize("Get coin successfully")
+            rewarded.load()
+        }
+    }
+
     async function handleGetVideoReward(didGetDoubleCoin) {
         if (didGetDoubleCoin) {
-            rewarded.show()
+            showRewardedAd()
         }
 
         try {
@@ -100,7 +111,7 @@ const TemplateScreen = ({ activityType=ACTIVITY_TYPE.WATCH }) => {
             userContext.addCoin(didGetDoubleCoin ? rewardCoin * 2 : rewardCoin);
             userContext.setWatchToBonusCount(prevValue => prevValue += 1)
 
-            fetchVideo(userContext.googleUserId, additionalActivity)
+            fetchVideo(additionalActivity)
         } catch (error) {
             Alert.alert("Error", error.message)
         } finally {
@@ -108,45 +119,35 @@ const TemplateScreen = ({ activityType=ACTIVITY_TYPE.WATCH }) => {
         }
     }
     
-    function setupFirstScreenRender() {
-        if (activityType === ACTIVITY_TYPE.WATCH) {
-            setAdditionalActivity(ADDITIONAL_ACTIVITY.NO_OPTION)
-            fetchVideo(userContext.googleUserId, ADDITIONAL_ACTIVITY.NO_OPTION)
-        } else if (activityType === ACTIVITY_TYPE.SUBSCRIBE) {
-            setAdditionalActivity(ADDITIONAL_ACTIVITY.SUBSCRIBE)
-            fetchVideo(userContext.googleUserId, ADDITIONAL_ACTIVITY.SUBSCRIBE)
-        } else if (activityType === ACTIVITY_TYPE.LIKE) {
-            setAdditionalActivity(ADDITIONAL_ACTIVITY.LIKE)
-            fetchVideo(userContext.googleUserId, ADDITIONAL_ACTIVITY.LIKE)
-        } else {
-            setAdditionalActivity(ADDITIONAL_ACTIVITY.COMMENT)
-            fetchVideo(userContext.googleUserId, ADDITIONAL_ACTIVITY.COMMENT)
-        }
-    }
-
     useEffect(() => {
-        setupFirstScreenRender()
-
-        // Load ads
-        const unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-          setIsAdsLoaded(true);
-        });
-        const unsubscribeEarned = rewarded.addAdEventListener(
-          RewardedAdEventType.EARNED_REWARD,
-          reward => {
+        var unsubscribeEarned = rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
             notificationContext.initialize("Get coin successfully")
-          },
-        );
+        });
     
-        // Start loading the rewarded ad straight away
         rewarded.load();
-    
-        // Unsubscribe from events on unmount
+
         return () => {
-          unsubscribeLoaded();
-          unsubscribeEarned();
+            unsubscribeEarned();
         };
-    }, []);
+    }, [])
+    
+    useEffect(() => {
+        if (userContext.googleUserId != null) {
+            if (activityType == ACTIVITY_TYPE.WATCH) {
+                setAdditionalActivity(ADDITIONAL_ACTIVITY.NO_OPTION)
+                fetchVideo(ADDITIONAL_ACTIVITY.NO_OPTION)
+            } else if (activityType == ACTIVITY_TYPE.SUBSCRIBE) {
+                setAdditionalActivity(ADDITIONAL_ACTIVITY.SUBSCRIBE)
+                fetchVideo( ADDITIONAL_ACTIVITY.SUBSCRIBE)
+            } else if (activityType == ACTIVITY_TYPE.LIKE) {
+                setAdditionalActivity(ADDITIONAL_ACTIVITY.LIKE)
+                fetchVideo(ADDITIONAL_ACTIVITY.LIKE)
+            } else {
+                setAdditionalActivity(ADDITIONAL_ACTIVITY.COMMENT)
+                fetchVideo(ADDITIONAL_ACTIVITY.COMMENT)
+            }
+        }
+    }, [userContext.googleUserId])
 
     function clickGetVideoBonus() {
         dialogContext.initialize(
@@ -164,11 +165,7 @@ const TemplateScreen = ({ activityType=ACTIVITY_TYPE.WATCH }) => {
   
     async function handleGetVideoBonus(didGetDoubleCoin) {
         if (didGetDoubleCoin) {
-            try {
-                rewarded.show()
-            } catch (error) {
-                console.log(error.message)
-            }
+            showRewardedAd()
         }
 
         try {
@@ -188,15 +185,15 @@ const TemplateScreen = ({ activityType=ACTIVITY_TYPE.WATCH }) => {
 
     return (
         <>
-            <View style={styles.containerTop}>
+            <View className="relative bg-black flex-2 w-full justify-center items-center">
                 {
                     isVideoLoading && <ActivityIndicator size={50}/>
                 }
                 <Image source={{uri: `https://i.ytimg.com/vi/${video['ytVideoId']}/0.jpg`}} 
-                    style={!isVideoLoading && {width: "100%", height: '100%', resizeMode: 'contain'}}
+                    style={!isVideoLoading && {width: "100%", height: '100%', objectFit: 'contain'}}
                     onLoad={() => setIsVideoLoading(false)}
                 />
-                <View style={{position: 'absolute', left: 0, bottom: 0, width: '100%', alignItems: 'center', paddingVertical: 10}}>
+                <View className="absolute left-0 bottom-0 w-full items-center py-primary">
                     <Pressable onPress={clickGetVideoBonus}>
                         {
                             userContext.watchToBonusCount == 0 ?
@@ -209,20 +206,20 @@ const TemplateScreen = ({ activityType=ACTIVITY_TYPE.WATCH }) => {
                         }
                     </Pressable>
                 </View>
-                <View style={{position: 'absolute', right: 0, bottom: 0, flexDirection: "row", justifyContent: 'flex-end' ,alignItems: 'center', paddingVertical: 10}}>
+                <View className="absolute right-0 bottom-0 flex-row justify-end items-center py-primary">
                     <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>Auto play</Text>
                     <Switch 
                         trackColor={{ false: "white", true: 'black' }}
                         thumbColor={'#FFC000'}
                         onValueChange={() => Alert.alert("Updating", "Updating soon")}
-                        style={[{height: 40}]}
+                        style={[{height: 50}]}
                     />
                 </View>
             </View>
             <View style={styles.containerBottom}>
-                <View style={{flexDirection: 'row', flex: 1, justifyContent: 'space-evenly', alignItems: 'center'}}>
-                    <View style={[styles.leftSide, {flex: 1}]}>
-                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                <View className="flex-row flex-1 justify-evenly items-center">
+                    <View className="flex-1">
+                        <View className="flex-row justify-center items-center">
                             <Image source={CoinIcon} style={{width: 30, height: 30}}/>
                             <Text style={{color: "#FFC000", fontWeight: 'bold', fontSize: 30, marginLeft: 10}}>Coin</Text>
                         </View>
@@ -230,17 +227,17 @@ const TemplateScreen = ({ activityType=ACTIVITY_TYPE.WATCH }) => {
                             {activityType === ACTIVITY_TYPE.WATCH ? video['coinPerView'] : video['coinPerView']+60}
                         </Text>
                     </View>
-                    <View style={styles.verticalBar}></View>
-                    <View style={[ styles.rightSide, {flex: 1}]}>
-                        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                    <View className="verticalBar w-1 h-4/5 bg-primary"></View>
+                    <View className="flex-1">
+                        <View className="flex-row justify-center items-center">
                             <TimeIcon color='black' width={30} height={30}/>
                             <Text style={{color: "black", fontWeight: 'bold', fontSize: 30, marginLeft: 10}}>Time</Text>
                         </View>
-                        <Text style={{textAlign: 'center', color: "black", fontWeight: 'bold', fontSize: 30}}>{video['timePerView']}</Text>
+                        <Text className="text-center text-black font-bold text-30">{video['timePerView']}</Text>
                     </View>
                 </View>
-                <View style={styles.horizontalBar}></View>
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', width: "100%"}}>
+                <View className="horizontalBar w-5/6 h-1 bg-primary"></View>
+                <View className="flex-1 flex-row justify-evenly items-center w-full">
                     <Button title={"Other"} onPress={skipOtherVideo} paddingHorizontal={10} paddingVertical={5}/>
                     <Button title={activityType} onPress={clickWatchVideo} paddingHorizontal={10} paddingVertical={5}/>
                 </View>
@@ -252,11 +249,6 @@ const TemplateScreen = ({ activityType=ACTIVITY_TYPE.WATCH }) => {
 export default TemplateScreen
 
 const styles = StyleSheet.create({
-    container: {
-        height: '100%',
-        width: '100%',
-        alignItems: 'center'
-    },
     containerTop: {
         position: 'relative',
         backgroundColor: 'black',
@@ -270,15 +262,5 @@ const styles = StyleSheet.create({
         width: "100%",
         justifyContent: 'space-evenly',
         alignItems: 'center'
-    },
-    horizontalBar: {
-        width: '90%',
-        height: 2,
-        backgroundColor: GlobalStyles.primaryColor
-    },
-    verticalBar: {
-        width: 2,
-        height: '80%',
-        backgroundColor: GlobalStyles.primaryColor
     },
 })

@@ -96,8 +96,9 @@ public class UserService {
             user.setEmail(String.valueOf(userInfo.get("email")));
             user.setPicture(String.valueOf(userInfo.get("picture")));
             user.setCoin(300);
-            LocalDateTime time = LocalDateTime.now();
-            user.setPremiumTime(time.plusDays(1));
+//            LocalDateTime time = LocalDateTime.now();
+//            user.setPremiumTime(time.plusDays(1));
+            user.setPremiumTime(LocalDateTime.now());
             user.setCreatedTime(LocalDateTime.now());
 
             userRepository.save(user);
@@ -153,7 +154,7 @@ public class UserService {
             activityTracking.setDidEnterReferralCode(true);
             invitee.setActivityTracking(activityTracking);
 
-            rewardUserFromReferralCode(inviter, 600, "Invite friend");
+            rewardUserFromReferralCode(inviter, 1200, "Invite friend");
             saveInvitationRecord(inviter, invitee.getEmail());
 
             response.put("message", "Enter referral code successfully");
@@ -188,7 +189,7 @@ public class UserService {
     }
     private void rewardUserFromReferralCode(User user, Integer coinPerView, String activityName) {
         user.setCoin(user.getCoin() + coinPerView);
-        user.setPremiumTime(user.getPremiumTime().plusDays(1));
+//        user.setPremiumTime(user.getPremiumTime().plusDays(1));
         
         saveEarningHistory(user, coinPerView, activityName);
         userRepository.save(user);

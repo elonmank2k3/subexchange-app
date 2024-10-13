@@ -93,7 +93,7 @@ const LikeScreen = () => {
 
   return (
       <>
-        <View style={styles.container}>
+        <View className="h-full w-full items-center">
           <TemplateScreen activityType={ACTIVITY_TYPE.LIKE}/>
         </View>
       </>
@@ -101,11 +101,3 @@ const LikeScreen = () => {
 }
 
 export default LikeScreen
-
-const styles = StyleSheet.create({
-  container: {
-      height: '100%',
-      width: '100%',
-      alignItems: 'center'
-  },
-})

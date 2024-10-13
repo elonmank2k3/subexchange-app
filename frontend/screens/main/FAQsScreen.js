@@ -1,6 +1,5 @@
-import { View, Text, StyleSheet, FlatList } from 'react-native'
+import { View, Text, FlatList } from 'react-native'
 import React from 'react'
-import { GlobalStyles } from '../../constants/globalStyles'
 
 const FAQsScreen = () => {
   const FAQs = [
@@ -32,16 +31,16 @@ const FAQsScreen = () => {
   ]
 
   return (
-    <View style={styles.container}>
+    <View className="w-full px-primary items-center flex-1">
       <FlatList 
         data={FAQs}
         keyExtractor={item => item.id.toString()}  
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
-          <View style={[styles.item]}>
-            <Text style={styles.question}>{item.id}. {item.question}</Text>
+          <View className="flex-row justify-between bg-primary w-full py-[15] mt-[10] rounded-lg px-primary flex-wrap">
+            <Text style={{fontSize: 18}} className="font-bold text-white">{item.id}. {item.question}</Text>
             <View style={{marginTop: 20}}>
-              <Text style={styles.answer}>{item.answer}</Text>
+              <Text style={{fontSize: 15, textAlign: 'justify', color: 'white'}}>{item.answer}</Text>
             </View>
           </View>
         )}
@@ -52,33 +51,3 @@ const FAQsScreen = () => {
 }
 
 export default FAQsScreen
-
-const styles = StyleSheet.create({
-  container: {
-      width: '100%',
-      paddingHorizontal: GlobalStyles.spacing,
-      alignItems: 'center',
-      flex: 1
-  },
-  item: {
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    backgroundColor: GlobalStyles.primaryColor, 
-    width: '100%', 
-    paddingVertical: 15, 
-    marginTop: 20,
-    borderRadius: 10, 
-    paddingHorizontal: GlobalStyles.spacing,
-    flexWrap: 'wrap'
-  },
-  question: {
-    fontSize: 18, fontWeight: 'bold',
-    color: 'white'
-  },
-  answer: {
-    fontSize: 15,
-    textAlign: 'justify',
-    color: 'white'
-  }
-})

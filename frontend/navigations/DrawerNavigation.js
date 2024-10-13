@@ -88,14 +88,14 @@ const InviteFriendScreenStack = ({ navigation }) => {
       );
 };
 
-const DrawerNavigation = () => {
+const DrawerNavigation = ({ setStartStep }) => {
     const userContext = useContext(UserContext)
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const data = await fetchUserInfo(userContext.googleUserId);
-                if (data['status'] == 'fail') {
+                if (data['status'] === 'fail') {
                     Alert.alert("Fail", data['message'])
                     return 
                 }
@@ -116,13 +116,12 @@ const DrawerNavigation = () => {
         if (userContext.googleUserId != null) {
             fetchData();
         }
-        console.log("googleUserId: " + userContext.googleUserId)
      }, [userContext.googleUserId]);
 
     return (
         <Drawer.Navigator 
         initialRouteName="Earn Coin"
-        drawerContent={(props) => <CustomDrawerContent {...props} />}
+        drawerContent={(props) => <CustomDrawerContent {...props} setStartStep={setStartStep} />}
         screenOptions={{
             headerStyle: { backgroundColor: GlobalStyles.primaryColor },
             headerTintColor: 'white',
